@@ -1,0 +1,42 @@
+<mat-grid-list cols="3">
+  <mat-grid-tile *ngIf="fileUploaded">
+    <video
+      id="elSourceVideo"
+      #elSourceVideo
+      class="video-js"
+      controls
+      preload="auto"
+      width="640"
+      height="264"
+      poster=""
+      data-setup="{}"
+    >
+    <source [src]="sourceVideo.src" type="{{sourceVideo.type}}" />
+  </video>
+  </mat-grid-tile>
+  <mat-grid-tile *ngIf="fileUploaded">2</mat-grid-tile>
+  <mat-grid-tile *ngIf="fileUploaded">3</mat-grid-tile>
+  <mat-grid-tile
+    [colspan]="3"
+    >
+    <form [formGroup]="form" class="upload-form">
+      <!-- Загрузка файла -->
+      <app-file-upload class="file-upload__ctrl"
+        formControlName="fileCtrl"
+        *ngIf="!fileUploaded"
+        [acceptType]="'video/*'"
+        (fileUploaded)="onFilePicked($event)"
+        [title]="'Drag video file, or click here'">
+      </app-file-upload>
+    </form>
+  </mat-grid-tile
+  >
+</mat-grid-list>
+
+
+  <!-- <form [formGroup]="form">
+</form>
+
+<app-ffmpeg
+  *ngIf="fileUploaded"
+  [afterFilePicked]="afterFilePicked"></app-ffmpeg> -->

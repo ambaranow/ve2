@@ -6,5 +6,8 @@
     [readMode]="readModeType"
     (filePick)="onFilePicked($event)"
     (fileDrop)="onFilePicked($event)">
-  <span>{{ title }}</span>
+  <span>
+    {{ title }}:
+    <i class="material-icons">add_to_queue</i>
+  </span>
 </div>

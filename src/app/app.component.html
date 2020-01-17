@@ -1,15 +1,2 @@
 
-<form [formGroup]="form">
-  <!-- Загрузка файла -->
-  <app-file-upload class="file-upload__ctrl"
-    formControlName="fileCtrl"
-    *ngIf="!fileUploaded"
-    [acceptType]="'video/*'"
-    (fileUploaded)="onFilePicked($event)"
-    [title]="'Drag file here'">
-  </app-file-upload>
-</form>
-
-<app-ffmpeg
-  *ngIf="fileUploaded"
-  [afterFilePicked]="afterFilePicked"></app-ffmpeg>
+<app-editor-area></app-editor-area>

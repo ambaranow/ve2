@@ -3,11 +3,8 @@ import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { MatButtonModule, MatProgressBarModule, MatIconModule, MatCardModule } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { FileUploadModule } from './file-upload/file-upload.module';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { FfmpegModule } from './ffmpeg/ffmpeg.module';
+import { EditorAreaModule } from './editor-area/editor-area.module';
 
 @NgModule({
   declarations: [
@@ -17,14 +14,7 @@ import { FfmpegModule } from './ffmpeg/ffmpeg.module';
     AppRoutingModule,
     BrowserModule,
     BrowserAnimationsModule,
-    FfmpegModule,
-    FileUploadModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatButtonModule,
-    MatProgressBarModule,
-    MatIconModule,
-    MatCardModule,
+    EditorAreaModule
   ],
   providers: [],
   bootstrap: [AppComponent]
