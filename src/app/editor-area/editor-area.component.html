@@ -15,7 +15,23 @@
   </video>
   </mat-grid-tile>
   <mat-grid-tile *ngIf="fileUploaded">2</mat-grid-tile>
-  <mat-grid-tile *ngIf="fileUploaded">3</mat-grid-tile>
+  <mat-grid-tile *ngIf="fileUploaded">
+    <video
+      id="elTargetVideo"
+      #elTargetVideo
+      class="video-js"
+      controls
+      preload="auto"
+      width="640"
+      height="264"
+      poster=""
+      data-setup="{}"
+    >
+    <source
+      [src]="targetVideo.src" type="{{targetVideo.type}}" />
+  </video>
+    
+  </mat-grid-tile>
   <mat-grid-tile
     [colspan]="3"
     >

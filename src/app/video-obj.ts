@@ -1,8 +1,10 @@
+import { SafeUrl } from '@angular/platform-browser';
+
 /**
- * SourceVideo
+ * VideoObj
  */
-export interface SourceVideo {
-  src: string;
+export interface VideoObj {
+  src: SafeUrl;
   file: File;
   type: string;
   // constructor(data: any) {

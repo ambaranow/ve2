@@ -1,16 +1,21 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { SourceVideo } from './source-video';
+import { VideoObj } from './video-obj';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Injectable({
   providedIn: 'root'
 })
 export class VideoFileService {
 
-  sourceVideo: SourceVideo;
-  sourceVideoSubj: BehaviorSubject <SourceVideo> = new BehaviorSubject<SourceVideo>(null);
+  sourceVideo: VideoObj;
+  sourceVideoSubj: BehaviorSubject<VideoObj> = new BehaviorSubject<VideoObj>(null);
+  targetVideo: VideoObj;
+  targetVideoSubj: BehaviorSubject<VideoObj> = new BehaviorSubject<VideoObj>(null);
 
-  constructor() { }
+  constructor(
+    private sanitizer: DomSanitizer,
+  ) { }
 
   getSource() {
     return this.sourceVideo;
@@ -18,11 +23,25 @@ export class VideoFileService {
 
   setSource(sourceVideo: { content: any; type: any; }) {
     this.sourceVideo = {
-      src: sourceVideo.content,
+      src: this.sanitizer.bypassSecurityTrustUrl(sourceVideo.content),
       file: new File([this.dataURLtoU8arr(sourceVideo.content)], name, { type: sourceVideo.type }),
       type: sourceVideo.type
     };
     this.sourceVideoSubj.next(this.sourceVideo);
+  }
+
+  setTarget(targetVideo: { data: any; type: any; }) {
+    this.targetVideo = {
+      src: this.sanitizer.bypassSecurityTrustUrl(
+        URL.createObjectURL(
+          new Blob([targetVideo.data.data], { type: targetVideo.type })
+        )
+      ),
+      file: new File([targetVideo.data], name, { type: targetVideo.type }),
+      type: targetVideo.type
+    };
+    this.targetVideoSubj.next(this.targetVideo);
+    this.targetVideoSubj.next(this.targetVideo);
   }
 
   dataURLtoU8arr(dataurl) {
