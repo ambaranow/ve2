@@ -1,7 +1,8 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { VideoFileService } from '../video-file.service';
 import { FormGroup, FormControl } from '@angular/forms';
 import { VideoObj } from '../video-obj';
+import { VideoFileService } from '../video-file.service';
+import { VideoWorkService } from '../video-work.service';
 
 @Component({
   selector: 'app-editor-area',
@@ -13,8 +14,10 @@ export class EditorAreaComponent implements OnInit {
   fileUploaded = false;
   sourceVideo: VideoObj;
   targetVideo: VideoObj;
+  keyFrames = [];
   constructor(
     private videoFileService: VideoFileService,
+    private videoWorkService: VideoWorkService,
   ) { }
 
   @ViewChild('elSourceVideo', {static: false})
@@ -34,7 +37,14 @@ export class EditorAreaComponent implements OnInit {
   onFilePicked($event) {
     this.videoFileService.setSource($event);
     this.sourceVideo = this.videoFileService.getSource();
-    this.targetVideo = this.videoFileService.getSource();
+    this.videoFileService.targetVideoSubj.subscribe(f => {
+      this.targetVideo = f;
+    })
+    this.videoWorkService.getFileInfo(this.sourceVideo).then(fileinfo => {
+      this.videoWorkService.getKeyFrames(this.sourceVideo).then(res => {
+        this.keyFrames = res;
+      });
+    });
     this.fileUploaded = true;
   }
 

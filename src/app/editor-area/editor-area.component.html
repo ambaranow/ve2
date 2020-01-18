@@ -1,5 +1,5 @@
 <mat-grid-list cols="3">
-  <mat-grid-tile *ngIf="fileUploaded">
+  <mat-grid-tile *ngIf="fileUploaded && sourceVideo">
     <video
       id="elSourceVideo"
       #elSourceVideo
@@ -15,7 +15,7 @@
   </video>
   </mat-grid-tile>
   <mat-grid-tile *ngIf="fileUploaded">2</mat-grid-tile>
-  <mat-grid-tile *ngIf="fileUploaded">
+  <mat-grid-tile *ngIf="fileUploaded && targetVideo">
     <video
       id="elTargetVideo"
       #elTargetVideo
@@ -49,7 +49,7 @@
   >
 </mat-grid-list>
 
-
+<img [src]="src" *ngFor="let src of keyFrames" />
   <!-- <form [formGroup]="form">
 </form>
 

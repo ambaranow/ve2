@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { VideoObj } from './video-obj';
 import { DomSanitizer } from '@angular/platform-browser';
+import { ReadFile } from 'ngx-file-helpers';
 
 @Injectable({
   providedIn: 'root'
@@ -17,30 +18,38 @@ export class VideoFileService {
     private sanitizer: DomSanitizer,
   ) { }
 
+  getFileName(f) {
+    const { name } = f;
+    return name.replace(/\s/g, '+');
+  }
+
   getSource() {
     return this.sourceVideo;
   }
 
-  setSource(sourceVideo: { content: any; type: any; }) {
+  getTarget() {
+    return this.targetVideo;
+  }
+
+  setSource(sourceVideo: ReadFile) {
     this.sourceVideo = {
       src: this.sanitizer.bypassSecurityTrustUrl(sourceVideo.content),
-      file: new File([this.dataURLtoU8arr(sourceVideo.content)], name, { type: sourceVideo.type }),
+      file: new File([this.dataURLtoU8arr(sourceVideo.content)], this.getFileName(sourceVideo), { type: sourceVideo.type }),
       type: sourceVideo.type
     };
     this.sourceVideoSubj.next(this.sourceVideo);
   }
 
-  setTarget(targetVideo: { data: any; type: any; }) {
+  setTarget(targetVideo) {
     this.targetVideo = {
       src: this.sanitizer.bypassSecurityTrustUrl(
         URL.createObjectURL(
-          new Blob([targetVideo.data.data], { type: targetVideo.type })
+          new Blob([targetVideo.data], { type: targetVideo.type })
         )
       ),
-      file: new File([targetVideo.data], name, { type: targetVideo.type }),
+      file: new File([targetVideo.data], this.getFileName(targetVideo), { type: targetVideo.type }),
       type: targetVideo.type
     };
-    this.targetVideoSubj.next(this.targetVideo);
     this.targetVideoSubj.next(this.targetVideo);
   }
 
