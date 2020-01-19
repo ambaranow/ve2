@@ -46,6 +46,7 @@ export class EditorAreaComponent implements OnInit {
       });
     });
     this.fileUploaded = true;
+    // console.log(this._elSourceVideo)
   }
 
 }

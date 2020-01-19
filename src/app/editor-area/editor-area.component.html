@@ -1,39 +1,23 @@
-<mat-grid-list cols="3">
+<mat-grid-list cols="2">
   <mat-grid-tile *ngIf="fileUploaded && sourceVideo">
-    <video
-      id="elSourceVideo"
-      #elSourceVideo
-      class="video-js"
-      controls
-      preload="auto"
-      width="640"
-      height="264"
-      poster=""
-      data-setup="{}"
-    >
-    <source [src]="sourceVideo.src" type="{{sourceVideo.type}}" />
-  </video>
+    <div class="video-wrapper">
+      <video id="elSourceVideo" #elSourceVideo class="video-js" controls preload="auto" width="640" height="264" poster=""
+        data-setup="{}">
+        <source [src]="sourceVideo.src" type="{{sourceVideo.type}}" />
+      </video>
+    </div>
   </mat-grid-tile>
-  <mat-grid-tile *ngIf="fileUploaded">2</mat-grid-tile>
+  <!-- <!-- <mat-grid-tile *ngIf="fileUploaded">2</mat-grid-tile> -->
   <mat-grid-tile *ngIf="fileUploaded && targetVideo">
-    <video
-      id="elTargetVideo"
-      #elTargetVideo
-      class="video-js"
-      controls
-      preload="auto"
-      width="640"
-      height="264"
-      poster=""
-      data-setup="{}"
-    >
-    <source
-      [src]="targetVideo.src" type="{{targetVideo.type}}" />
-  </video>
-    
+    <div class="video-wrapper">
+      <video id="elTargetVideo" #elTargetVideo class="video-js" controls preload="auto" width="640" height="264" poster=""
+        data-setup="{}">
+        <source [src]="targetVideo.src" type="{{targetVideo.type}}" />
+      </video>
+    </div>
   </mat-grid-tile>
   <mat-grid-tile
-    [colspan]="3"
+    [colspan]="2"
     >
     <form [formGroup]="form" class="upload-form">
       <!-- Загрузка файла -->
