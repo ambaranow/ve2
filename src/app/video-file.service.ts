@@ -13,6 +13,7 @@ export class VideoFileService {
   sourceVideoSubj: BehaviorSubject<VideoObj> = new BehaviorSubject<VideoObj>(null);
   targetVideo: VideoObj;
   targetVideoSubj: BehaviorSubject<VideoObj> = new BehaviorSubject<VideoObj>(null);
+  sourceFileInfo;
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -51,6 +52,13 @@ export class VideoFileService {
       type: targetVideo.type
     };
     this.targetVideoSubj.next(this.targetVideo);
+  }
+
+  getFileInfo() {
+    return this.sourceFileInfo;
+  }
+  setFileInfo(info) {
+    this.sourceFileInfo = info;
   }
 
   dataURLtoU8arr(dataurl) {

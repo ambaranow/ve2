@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { VideoCropperComponent } from './video-cropper.component';
+import { VideoTrimmerComponent } from './video-trimmer.component';
 
-describe('VideoCropperComponent', () => {
-  let component: VideoCropperComponent;
-  let fixture: ComponentFixture<VideoCropperComponent>;
+describe('VideoTrimmerComponent', () => {
+  let component: VideoTrimmerComponent;
+  let fixture: ComponentFixture<VideoTrimmerComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ VideoCropperComponent ]
+      declarations: [ VideoTrimmerComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(VideoCropperComponent);
+    fixture = TestBed.createComponent(VideoTrimmerComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

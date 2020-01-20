@@ -40,7 +40,10 @@ export class HelpersServiceService {
   }
 
   getFps(fileinfo) {
+    console.log('getFps')
+    console.log(fileinfo)
     let res = 1;
+    // const durSeconds = Math.floor((fileinfo.durationMs || this.timeString2ms(fileinfo.time)) / 1000);
     const durSeconds = Math.floor(this.timeString2ms(fileinfo.time) / 1000);
     if (!isNaN(durSeconds)) {
       res = 1 / (durSeconds / 20);

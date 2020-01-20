@@ -15,6 +15,7 @@ export class VideoWorkService {
   progress: BehaviorSubject<number> = new BehaviorSubject<number>(-1);
   message: BehaviorSubject<any> = new BehaviorSubject<any>(null);
   id = String((new Date()).getTime());
+  fileInfoSubj: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -46,12 +47,12 @@ export class VideoWorkService {
     await this.worker.load();
   }
 
-  async getKeyFrames(f: VideoObj,  fileinfo: any) {
+  async getKeyFrames(f: VideoObj) {
     if (!this.isInited) {
       await this.init();
     }
     await this.worker.write(f.file.name, f.file);
-    const fps = this.helpersService.getFps(fileinfo) || 1;
+    const fps = this.helpersService.getFps(this.videoFileService.getFileInfo()) || 1;
     // console.log('fps = ' + fps)
     await this.worker.run('-i ' + f.file.name + ' -loglevel info -stats -f image2 -vf fps=' + fps + ',showinfo -an out_%d.jpeg');
     const filemask = /out_\d*\.jpeg/;
@@ -79,11 +80,15 @@ export class VideoWorkService {
       await this.init();
     }
     await this.worker.write(f.file.name, f.file);
-    let result = {};
+    let result: any = {};
     const messSubscriber = this.message.subscribe(res => {
       if (res) {
         const resObj = this.helpersService.parseMessageToJson(res.message);
         result = {...result, ...resObj};
+        if (result.time) {
+          result.durationMs = this.helpersService.timeString2ms(result.time);
+        }
+        this.fileInfoSubj.next(result);
       }
     });
     // await this.worker.run('--help');

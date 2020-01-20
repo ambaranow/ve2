@@ -1,0 +1,20 @@
+<mat-slider
+  *ngIf="durationMs"
+  thumbLabel="true"
+  min="0"
+  max="{{durationMs}}"
+  step="1"
+  [(ngModel)]="trim.min"
+  value="{{trim.min}}"></mat-slider>
+<mat-slider
+  *ngIf="durationMs"
+  thumbLabel="true"
+  min="0"
+  max="{{durationMs}}"
+  step="1"
+  [(ngModel)]="trim.max"
+  value="{{durationMs}}"></mat-slider>
+<app-keyframes-line
+  *ngIf="keyFrames.length"
+  [keyFrames]="keyFrames"
+></app-keyframes-line>

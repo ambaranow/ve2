@@ -17,7 +17,6 @@ export class EditorAreaComponent implements OnInit {
   targetVideo: VideoObj;
   keyFrames = [];
   progress: number = undefined;
-  fileInfo: any;
 
   constructor(
     private videoFileService: VideoFileService,
@@ -53,14 +52,16 @@ export class EditorAreaComponent implements OnInit {
     this.videoFileService.targetVideoSubj.subscribe(f => {
       this.targetVideo = f;
     })
-    this.videoWorkService.getFileInfo(this.sourceVideo).then((fileInfo: any) => {
-      this.fileInfo = fileInfo;
-      this.videoWorkService.getKeyFrames(this.sourceVideo,  this.fileInfo).then(res => {
-        this.keyFrames = res;
-      });
+    this.videoWorkService.getFileInfo(this.sourceVideo).then(() => { });
+    this.videoWorkService.fileInfoSubj.subscribe(info => {
+      this.videoFileService.setFileInfo(info);
+      if (info && info.durationMs) {
+        this.videoWorkService.getKeyFrames(this.sourceVideo).then(res => {
+          this.keyFrames = res;
+        });
+      }
     });
     this.fileUploaded = true;
-    // console.log(this._elSourceVideo)
   }
 
 }
