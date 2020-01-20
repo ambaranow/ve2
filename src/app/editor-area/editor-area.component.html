@@ -1,3 +1,11 @@
+<mat-progress-bar
+  *ngIf="progress > 0 && progress < 100"
+  class="example-margin"
+  mode="determinate"
+  [value]="progress"
+  ></mat-progress-bar>
+
+
 <mat-grid-list cols="2">
   <mat-grid-tile *ngIf="fileUploaded && sourceVideo">
     <div class="video-wrapper">
@@ -32,6 +40,7 @@
   </mat-grid-tile
   >
 </mat-grid-list>
+
 
 <img [src]="src" *ngFor="let src of keyFrames" />
   <!-- <form [formGroup]="form">

@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { VideoFileService } from './video-file.service';
 import { DomSanitizer } from '@angular/platform-browser';
+import { HelpersServiceService } from './helpers-service.service';
+import { VideoObj } from './video-obj';
 
 @Injectable({
   providedIn: 'root'
@@ -12,11 +14,12 @@ export class VideoWorkService {
   isInited = false;
   progress: BehaviorSubject<number> = new BehaviorSubject<number>(-1);
   message: BehaviorSubject<any> = new BehaviorSubject<any>(null);
-  id = (new Date()).getTime();
+  id = String((new Date()).getTime());
 
   constructor(
     private sanitizer: DomSanitizer,
     private videoFileService: VideoFileService,
+    private helpersService: HelpersServiceService,
   ) { }
 
 
@@ -33,22 +36,24 @@ export class VideoWorkService {
         // }
       },
       progress: p => {
-        const prgrs = (!p || p.ratio < 0 || p.ratio > 1) ? -1 : p.ratio;
-        this.progress.next(Math.round(prgrs * 100));
-        console.log(p)
-        console.log(prgrs)
+        const prgrs = (!p || p.ratio < 0 || p.ratio > 1) ? 0 : p.ratio;
+        this.progress.next(Math.round(prgrs * 10000) / 100);
+        // console.log(p)
+        // console.log(prgrs)
       },
     });
     this.isInited = true;
     await this.worker.load();
   }
 
-  async getKeyFrames(f) {
+  async getKeyFrames(f: VideoObj,  fileinfo: any) {
     if (!this.isInited) {
       await this.init();
     }
     await this.worker.write(f.file.name, f.file);
-    await this.worker.run('-i ' + f.file.name + ' -loglevel info -stats -f image2 -vf fps=1,showinfo -an out_%d.jpeg');
+    const fps = this.helpersService.getFps(fileinfo) || 1;
+    console.log('fps = ' + fps)
+    await this.worker.run('-i ' + f.file.name + ' -loglevel info -stats -f image2 -vf fps=' + fps + ',showinfo -an out_%d.jpeg');
     const filemask = /out_\d*\.jpeg/;
     const { data } = await this.worker.ls('.');
     const keyFrames = [];
@@ -72,35 +77,31 @@ export class VideoWorkService {
     return keyFrames;
   }
 
-
   async getFileInfo(f) {
-    const outputFileName = this.getTargetFileName(f.file.name);
+    const outputFileName = this.helpersService.getTargetFileName(f.file.name, this.id);
     if (!this.isInited) {
       await this.init();
     }
     await this.worker.write(f.file.name, f.file);
+    let result = {};
     const messSubscriber = this.message.subscribe(res => {
       if (res) {
-        console.log(res.message);
+        const resObj = this.helpersService.parseMessageToJson(res.message);
+        result = {...result, ...resObj};
       }
     });
     // await this.worker.run('--help');
     // await this.worker.run('-i ' + f.file.name + ' -hide_banner -c copy -f null -');
     await this.worker.run('-i ' + f.file.name + ' -hide_banner -loglevel quiet -stats -c copy ' + outputFileName);
-
     const {data} = await this.worker.read(outputFileName);
     const targetFile = {
       data,
       type: f.file.type,
       name: outputFileName
-    }
+    };
     this.videoFileService.setTarget(targetFile);
     messSubscriber.unsubscribe();
+    return result;
   }
 
-  getTargetFileName(n) {
-    const extensionRegExp = /\.([0-9a-z]{1,5})$/i;
-    const extension = n.match(extensionRegExp)[1];
-    return 'v_' + this.id + '.' + extension.toLowerCase();
-  }
 }

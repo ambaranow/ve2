@@ -3,6 +3,7 @@ import { FormGroup, FormControl } from '@angular/forms';
 import { VideoObj } from '../video-obj';
 import { VideoFileService } from '../video-file.service';
 import { VideoWorkService } from '../video-work.service';
+import { HelpersServiceService } from '../helpers-service.service';
 
 @Component({
   selector: 'app-editor-area',
@@ -15,9 +16,12 @@ export class EditorAreaComponent implements OnInit {
   sourceVideo: VideoObj;
   targetVideo: VideoObj;
   keyFrames = [];
+  progress: number = undefined;
+
   constructor(
     private videoFileService: VideoFileService,
     private videoWorkService: VideoWorkService,
+    private helpersService: HelpersServiceService,
   ) { }
 
   @ViewChild('elSourceVideo', {static: false})
@@ -26,6 +30,14 @@ export class EditorAreaComponent implements OnInit {
 
   ngOnInit() {
     this.generateForm();
+    this.videoWorkService.progress.subscribe(res => {
+      if (typeof res === 'number' && (res > 0 || res < 100)) {
+        this.progress = res;
+      } else {
+        this.progress = 0;
+      }
+      console.log('this.progress = ' + this.progress)
+    });
   }
 
   generateForm() {
@@ -40,8 +52,8 @@ export class EditorAreaComponent implements OnInit {
     this.videoFileService.targetVideoSubj.subscribe(f => {
       this.targetVideo = f;
     })
-    this.videoWorkService.getFileInfo(this.sourceVideo).then(fileinfo => {
-      this.videoWorkService.getKeyFrames(this.sourceVideo).then(res => {
+    this.videoWorkService.getFileInfo(this.sourceVideo).then((fileinfo: any) => {
+      this.videoWorkService.getKeyFrames(this.sourceVideo,  fileinfo).then(res => {
         this.keyFrames = res;
       });
     });
