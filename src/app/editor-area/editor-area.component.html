@@ -6,29 +6,31 @@
   ></mat-progress-bar>
 
 
-<div>
-  <div *ngIf="fileUploaded && sourceVideo">
-    <div class="video-wrapper">
-      <video id="elSourceVideo" #elSourceVideo class="video-js" controls preload="auto" width="640" height="264" poster=""
-        data-setup="{}">
-        <source [src]="sourceVideo.src" type="{{sourceVideo.type}}" />
-      </video>
+<div class="editor-video">
+  <div class="editor-video__container">
+    <div class="editor-video__player">
+      <div *ngIf="fileUploaded && sourceVideo">
+        <div class="video-wrapper">
+          <video id="elSourceVideo" #elSourceVideo class="video-js" controls preload="auto" width="640" height="264" poster=""
+            data-setup="{}">
+            <source [src]="sourceVideo.src" type="{{sourceVideo.type}}" />
+          </video>
+        </div>
+      </div>
+    </div>
+    <div class="editor-video__player">
+      <div *ngIf="fileUploaded && targetVideo">
+        <div class="video-wrapper">
+          <video id="elTargetVideo" #elTargetVideo class="video-js" controls preload="auto" width="640" height="264" poster=""
+            data-setup="{}">
+            <source [src]="targetVideo.src" type="{{targetVideo.type}}" />
+          </video>
+        </div>
+      </div>
     </div>
   </div>
 
-  <app-keyframes-line
-    *ngIf="keyFrames.length"
-    [keyframes]="keyFrames"
-  ></app-keyframes-line>
-
-  <div *ngIf="fileUploaded && targetVideo">
-    <div class="video-wrapper">
-      <video id="elTargetVideo" #elTargetVideo class="video-js" controls preload="auto" width="640" height="264" poster=""
-        data-setup="{}">
-        <source [src]="targetVideo.src" type="{{targetVideo.type}}" />
-      </video>
-    </div>
-  </div>
+  <app-video-cropper [keyFrames]="keyFrames" [fileInfo]="fileInfo"></app-video-cropper>
   <div>
     <form [formGroup]="form" class="upload-form">
       <!-- Загрузка файла -->

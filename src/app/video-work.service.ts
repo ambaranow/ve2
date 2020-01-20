@@ -52,7 +52,7 @@ export class VideoWorkService {
     }
     await this.worker.write(f.file.name, f.file);
     const fps = this.helpersService.getFps(fileinfo) || 1;
-    console.log('fps = ' + fps)
+    // console.log('fps = ' + fps)
     await this.worker.run('-i ' + f.file.name + ' -loglevel info -stats -f image2 -vf fps=' + fps + ',showinfo -an out_%d.jpeg');
     const filemask = /out_\d*\.jpeg/;
     const { data } = await this.worker.ls('.');
@@ -61,10 +61,6 @@ export class VideoWorkService {
       if (filemask.test(path)) {
         const imageFile = await this.worker.read(path);
         const type = 'image/jpeg';
-        // this.keyFrames.push({
-        //   file: new File([file.data], path, { type }),
-        //   src: this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(new Blob([file.data], { type })))
-        // });
         keyFrames.push(
           this.sanitizer.bypassSecurityTrustUrl(
             URL.createObjectURL(

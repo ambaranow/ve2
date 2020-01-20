@@ -10,7 +10,7 @@ export class KeyframesLineComponent implements OnInit {
   constructor() { }
 
   @Input()
-  keyframes: [];
+  keyFrames: [];
 
   ngOnInit() {
   }

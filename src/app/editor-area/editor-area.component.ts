@@ -17,6 +17,7 @@ export class EditorAreaComponent implements OnInit {
   targetVideo: VideoObj;
   keyFrames = [];
   progress: number = undefined;
+  fileInfo: any;
 
   constructor(
     private videoFileService: VideoFileService,
@@ -52,8 +53,9 @@ export class EditorAreaComponent implements OnInit {
     this.videoFileService.targetVideoSubj.subscribe(f => {
       this.targetVideo = f;
     })
-    this.videoWorkService.getFileInfo(this.sourceVideo).then((fileinfo: any) => {
-      this.videoWorkService.getKeyFrames(this.sourceVideo,  fileinfo).then(res => {
+    this.videoWorkService.getFileInfo(this.sourceVideo).then((fileInfo: any) => {
+      this.fileInfo = fileInfo;
+      this.videoWorkService.getKeyFrames(this.sourceVideo,  this.fileInfo).then(res => {
         this.keyFrames = res;
       });
     });

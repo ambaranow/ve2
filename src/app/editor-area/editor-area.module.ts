@@ -5,8 +5,7 @@ import { MatButtonModule, MatProgressBarModule, MatIconModule, MatCardModule } f
 import { MatGridListModule } from '@angular/material/grid-list';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FileUploadModule } from './../file-upload/file-upload.module';
-import { KeyframesLineModule } from '../keyframes-line/keyframes-line.module';
-
+import { VideoCropperModule } from '../video-cropper/video-cropper.module';
 
 @NgModule({
   declarations: [EditorAreaComponent],
@@ -21,7 +20,7 @@ import { KeyframesLineModule } from '../keyframes-line/keyframes-line.module';
     MatGridListModule,
     MatIconModule,
     MatProgressBarModule,
-    KeyframesLineModule,
+    VideoCropperModule
   ]
 })
 export class EditorAreaModule { }
