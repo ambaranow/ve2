@@ -1,7 +1,13 @@
 .upload-form {
   width: 100%;
 }
-
+.editor-progress {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  z-index: 999;
+}
 .video {
   &-wrapper {
     padding-bottom: 56.25%;

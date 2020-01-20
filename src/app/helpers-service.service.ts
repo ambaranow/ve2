@@ -44,7 +44,7 @@ export class HelpersServiceService {
     const durSeconds = Math.floor(this.timeString2ms(fileinfo.time) / 1000);
     if (!isNaN(durSeconds)) {
       res = 1 / (durSeconds / 20);
-      res = Math.round(res * 100) / 100;
+      res = Math.floor(res * 100) / 100;
     }
     return res;
   }

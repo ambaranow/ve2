@@ -1,32 +1,35 @@
 <mat-progress-bar
-  *ngIf="progress > 0 && progress < 100"
-  class="example-margin"
+  *ngIf="1===1 || progress > 0 && progress < 100"
+  class="editor-progress"
   mode="determinate"
   [value]="progress"
   ></mat-progress-bar>
 
 
-<mat-grid-list cols="2">
-  <mat-grid-tile *ngIf="fileUploaded && sourceVideo">
+<div>
+  <div *ngIf="fileUploaded && sourceVideo">
     <div class="video-wrapper">
       <video id="elSourceVideo" #elSourceVideo class="video-js" controls preload="auto" width="640" height="264" poster=""
         data-setup="{}">
         <source [src]="sourceVideo.src" type="{{sourceVideo.type}}" />
       </video>
     </div>
-  </mat-grid-tile>
-  <!-- <!-- <mat-grid-tile *ngIf="fileUploaded">2</mat-grid-tile> -->
-  <mat-grid-tile *ngIf="fileUploaded && targetVideo">
+  </div>
+
+  <app-keyframes-line
+    *ngIf="keyFrames.length"
+    [keyframes]="keyFrames"
+  ></app-keyframes-line>
+
+  <div *ngIf="fileUploaded && targetVideo">
     <div class="video-wrapper">
       <video id="elTargetVideo" #elTargetVideo class="video-js" controls preload="auto" width="640" height="264" poster=""
         data-setup="{}">
         <source [src]="targetVideo.src" type="{{targetVideo.type}}" />
       </video>
     </div>
-  </mat-grid-tile>
-  <mat-grid-tile
-    [colspan]="2"
-    >
+  </div>
+  <div>
     <form [formGroup]="form" class="upload-form">
       <!-- Загрузка файла -->
       <app-file-upload class="file-upload__ctrl"
@@ -37,12 +40,9 @@
         [title]="'Drag video file, or click here'">
       </app-file-upload>
     </form>
-  </mat-grid-tile
-  >
-</mat-grid-list>
+  </div>
+</div>
 
-
-<img [src]="src" *ngFor="let src of keyFrames" />
   <!-- <form [formGroup]="form">
 </form>
 
