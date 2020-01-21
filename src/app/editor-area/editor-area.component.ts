@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, ViewEncapsulation } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { VideoObj } from '../video-obj';
 import { VideoFileService } from '../video-file.service';
@@ -8,7 +8,8 @@ import { HelpersServiceService } from '../helpers-service.service';
 @Component({
   selector: 'app-editor-area',
   templateUrl: './editor-area.component.html',
-  styleUrls: ['./editor-area.component.scss']
+  styleUrls: ['./editor-area.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class EditorAreaComponent implements OnInit {
   form: FormGroup;
