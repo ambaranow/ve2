@@ -15,5 +15,11 @@
     step="1"
     [(ngModel)]="trim.max" (change)="setRange($event, 'max')" [displayWith]="helpersService.ms2TimeString"
     value="{{durationMs}}"></mat-slider>
-
+</div>
+<div class="trim-actions" *ngIf="durationMs && keyFrames.length">
+  <div class="trim-actions__left"></div>
+  <div class="trim-actions__main">
+    <button mat-flat-button color="accent" (click)="actionTrim($event)" *ngIf="trim.max < durationMs || trim.min > 0">Trim</button>
+  </div>
+  <div class="trim-actions__right"></div>
 </div>

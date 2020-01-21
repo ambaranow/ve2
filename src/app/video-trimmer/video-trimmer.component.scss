@@ -91,3 +91,20 @@
     }
   }
 }
+.trim-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  &__left, &__main, &__right {
+    flex: 1 1 300px;
+  }
+  &__left {
+    text-align: left;
+  }
+  &__main {
+    text-align: center;
+  }
+  &__right {
+    text-align: right;
+  }
+}

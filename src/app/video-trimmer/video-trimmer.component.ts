@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, ViewEncapsulation } from '@angular/core';
 import { VideoWorkService } from '../video-work.service';
-import { HelpersServiceService } from '../helpers-service.service';
+import { HelpersService } from '../helpers.service';
 
 @Component({
   selector: 'app-video-trimmer',
@@ -22,7 +22,7 @@ export class VideoTrimmerComponent implements OnInit {
 
   constructor(
     private videoWorkService: VideoWorkService,
-    private helpersService: HelpersServiceService,
+    private helpersService: HelpersService,
   ) { }
 
   @Input()
@@ -61,4 +61,11 @@ export class VideoTrimmerComponent implements OnInit {
     return this.shadowTrim[key];
   }
 
+  async actionTrim() {
+    const params = {
+      start: this.helpersService.ms2TimeString(this.trim.min),
+      end: this.helpersService.ms2TimeString(this.trim.max)
+    }
+    await this.videoWorkService.trim(params);
+  }
 }

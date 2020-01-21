@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 @Injectable({
   providedIn: 'root'
 })
-export class HelpersServiceService {
+export class HelpersService {
 
   constructor() { }
 
@@ -14,6 +14,8 @@ export class HelpersServiceService {
    */
   timeString2ms(a: any, b?: number) {
     return a = (typeof a === 'string') ? a.split('.') : a,
+     a[1] = a[1] ? a[1] + '000' : '',
+     a[1] = a[1].slice(0, 3),
      b = a[1] * 1 || 0,
      a = a[0].split(':'),
      b + (a[2] ? a[0] * 3600 + a[1] * 60 + a[2] * 1 : a[1] ? a[0] * 60 + a[1] * 1 : a[0] * 1) * 1e3;
@@ -62,14 +64,11 @@ export class HelpersServiceService {
   }
 
   getFps(fileinfo) {
-    console.log('getFps');
-    console.log(fileinfo);
     let res = 1;
-    // const durSeconds = Math.floor((fileinfo.durationMs || this.timeString2ms(fileinfo.time)) / 1000);
     const durSeconds = Math.floor(this.timeString2ms(fileinfo.time) / 1000);
     if (!isNaN(durSeconds)) {
       res = 1 / (durSeconds / 20);
-      res = Math.floor(res * 100) / 100;
+      res = Math.floor(res * 100000) / 100000;
     }
     return res;
   }

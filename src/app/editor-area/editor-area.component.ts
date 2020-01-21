@@ -3,7 +3,7 @@ import { FormGroup, FormControl } from '@angular/forms';
 import { VideoObj } from '../video-obj';
 import { VideoFileService } from '../video-file.service';
 import { VideoWorkService } from '../video-work.service';
-import { HelpersServiceService } from '../helpers-service.service';
+import { HelpersService } from '../helpers.service';
 
 @Component({
   selector: 'app-editor-area',
@@ -22,7 +22,7 @@ export class EditorAreaComponent implements OnInit {
   constructor(
     private videoFileService: VideoFileService,
     private videoWorkService: VideoWorkService,
-    private helpersService: HelpersServiceService,
+    private helpersService: HelpersService,
   ) { }
 
   @ViewChild('elSourceVideo', {static: false})
@@ -37,7 +37,6 @@ export class EditorAreaComponent implements OnInit {
       } else {
         this.progress = 0;
       }
-      console.log('this.progress = ' + this.progress)
     });
   }
 
@@ -47,13 +46,17 @@ export class EditorAreaComponent implements OnInit {
     });
   }
 
-  onFilePicked($event) {
+  async onFilePicked($event) {
     this.videoFileService.setSource($event);
     this.sourceVideo = this.videoFileService.getSource();
+    this.fileUploaded = true;
+    await this.videoWorkService.getFileInfo(this.sourceVideo);
     this.videoFileService.targetVideoSubj.subscribe(f => {
-      this.targetVideo = f;
-    })
-    this.videoWorkService.getFileInfo(this.sourceVideo).then(() => { });
+      this.targetVideo = null;
+      setTimeout(() => {
+        this.targetVideo = f;
+      });
+    });
     this.videoWorkService.fileInfoSubj.subscribe(info => {
       this.videoFileService.setFileInfo(info);
       if (info && info.durationMs) {
@@ -62,7 +65,6 @@ export class EditorAreaComponent implements OnInit {
         });
       }
     });
-    this.fileUploaded = true;
   }
 
 }

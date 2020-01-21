@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { VideoFileService } from './video-file.service';
 import { DomSanitizer } from '@angular/platform-browser';
-import { HelpersServiceService } from './helpers-service.service';
+import { HelpersService } from './helpers.service';
 import { VideoObj } from './video-obj';
 
 @Injectable({
@@ -20,7 +20,7 @@ export class VideoWorkService {
   constructor(
     private sanitizer: DomSanitizer,
     private videoFileService: VideoFileService,
-    private helpersService: HelpersServiceService,
+    private helpersService: HelpersService,
   ) { }
 
 
@@ -39,8 +39,8 @@ export class VideoWorkService {
       progress: p => {
         const prgrs = (!p || p.ratio < 0 || p.ratio > 1) ? 0 : p.ratio;
         this.progress.next(Math.round(prgrs * 10000) / 100);
-        // console.log(p)
-        // console.log(prgrs)
+        console.log(p)
+        console.log(prgrs)
       },
     });
     this.isInited = true;
@@ -54,11 +54,14 @@ export class VideoWorkService {
     await this.worker.write(f.file.name, f.file);
     const fps = this.helpersService.getFps(this.videoFileService.getFileInfo()) || 1;
     // console.log('fps = ' + fps)
-    await this.worker.run('-i ' + f.file.name + ' -loglevel info -stats -f image2 -vf fps=' + fps + ',showinfo -an out_%d.jpeg');
+    // await this.worker.run('-i ' + f.file.name + ' -loglevel info -stats -f image2 -vf fps=' + fps + ',showinfo -an out_%d.jpeg');
+    await this.worker.run('-i ' + f.file.name + ' -loglevel info -stats -f image2 -vf fps=fps=' + fps + ':round=near,showinfo -an out_%d.jpeg');
     const filemask = /out_\d*\.jpeg/;
-    const { data } = await this.worker.ls('.');
+    const lsData = await this.worker.ls('.');
     const keyFrames = [];
-    for (const path of data) {
+    // console.log(lsData)
+    // console.log(typeof lsData.data)
+    for (const path of lsData.data) {
       if (filemask.test(path)) {
         const imageFile = await this.worker.read(path);
         const type = 'image/jpeg';
@@ -93,7 +96,8 @@ export class VideoWorkService {
     });
     // await this.worker.run('--help');
     // await this.worker.run('-i ' + f.file.name + ' -hide_banner -c copy -f null -');
-    await this.worker.run('-i ' + f.file.name + ' -hide_banner -loglevel quiet -stats -c copy ' + outputFileName);
+    // await this.worker.run('-i ' + f.file.name + ' -hide_banner -loglevel quiet -stats -c copy ' + outputFileName);
+    await this.worker.run('-i ' + f.file.name + ' -loglevel quiet -stats -c copy -y ' + outputFileName);
     const {data} = await this.worker.read(outputFileName);
     const targetFile = {
       data,
@@ -105,4 +109,29 @@ export class VideoWorkService {
     return result;
   }
 
+
+  async trim(params: {start: string, end: string}) {
+    const start = (new Date()).getTime();
+    // console.log(params)
+    if (!this.isInited) {
+      await this.init();
+    }
+    const inputFileName = this.videoFileService.sourceVideo.file.name;
+    const outputFileName = this.videoFileService.targetVideo.file.name;
+    const outputFileType = this.videoFileService.targetVideo.file.type;
+    await this.worker.trim(
+      inputFileName,
+      outputFileName,
+      params.start,
+      params.end);
+    const { data } = await this.worker.read(outputFileName);
+    const targetFile = {
+      data,
+      type: outputFileType,
+      name: outputFileName
+    };
+    this.videoFileService.setTarget(targetFile);
+    const end = (new Date()).getTime();
+    console.log('Duration = ' + this.helpersService.ms2TimeString(start - end));
+  }
 }
