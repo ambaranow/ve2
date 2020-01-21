@@ -9,7 +9,7 @@ export class HelpersServiceService {
 
   /**
    * Convert time string to milliseconds number
-   * @param a time(HH:MM:SS.mss)
+   * @param a time string HH:MM:SS.mss
    * @param b undefined
    */
   timeString2ms(a: any, b?: number) {
@@ -19,6 +19,25 @@ export class HelpersServiceService {
      b + (a[2] ? a[0] * 3600 + a[1] * 60 + a[2] * 1 : a[1] ? a[0] * 60 + a[1] * 1 : a[0] * 1) * 1e3;
    }
 
+  /**
+   * Convert milliseconds to time string
+   * @param ms number
+   */
+  ms2TimeString(s: number) {
+    // Pad to 2 or 3 digits, default is 2
+    function pad(n: number, z?: number) {
+      z = z || 2;
+      return ('00' + n).slice(-z);
+    }
+    const ms = s % 1000;
+    s = (s - ms) / 1000;
+    const secs = s % 60;
+    s = (s - secs) / 60;
+    const mins = s % 60;
+    const hrs = (s - mins) / 60;
+    return pad(hrs) + ':' + pad(mins) + ':' + pad(secs) + '.' + pad(ms, 3);
+  }
+
    /**
     * Convert string pairs to object
     * @param mess a=b c=d ... y=z
@@ -26,6 +45,9 @@ export class HelpersServiceService {
   parseMessageToJson(mess: string) {
     const matches = mess.match(/(\w*=)([^=]+)[\s|$]/gmi);
     const res = {};
+    if (!matches) {
+      return res;
+    }
     matches.forEach((pair: string) => {
       const kv = pair.split('=');
       res[kv[0]] = kv[1].trim();
@@ -40,8 +62,8 @@ export class HelpersServiceService {
   }
 
   getFps(fileinfo) {
-    console.log('getFps')
-    console.log(fileinfo)
+    console.log('getFps');
+    console.log(fileinfo);
     let res = 1;
     // const durSeconds = Math.floor((fileinfo.durationMs || this.timeString2ms(fileinfo.time)) / 1000);
     const durSeconds = Math.floor(this.timeString2ms(fileinfo.time) / 1000);
