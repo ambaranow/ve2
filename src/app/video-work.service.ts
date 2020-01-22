@@ -182,8 +182,8 @@ export class VideoWorkService {
     const outputFileType = this.videoFileService.targetVideo.file.type;
     if (params.duration) {
       await this.worker.run(`
-        -i ${inputFileName} \
         -ss ${params.start} \
+        -i ${inputFileName} \
         -t ${params.duration} \
         -loglevel info \
         -c copy -y ${outputFileName}
