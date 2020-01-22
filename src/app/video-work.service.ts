@@ -17,6 +17,8 @@ export class VideoWorkService {
   id = String((new Date()).getTime());
   fileInfoSubj: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
+  keyFrameSubj: BehaviorSubject<any> = new BehaviorSubject<any>(null);
+
   constructor(
     private sanitizer: DomSanitizer,
     private videoFileService: VideoFileService,
@@ -25,6 +27,7 @@ export class VideoWorkService {
 
 
   async init() {
+    const start = (new Date()).getTime();
     const { createWorker } = window['FFmpeg'];
     this.worker = createWorker({
       corePath: '/assets/ffmpeg-core.js',
@@ -39,24 +42,73 @@ export class VideoWorkService {
       progress: p => {
         const prgrs = (!p || p.ratio < 0 || p.ratio > 1) ? 0 : p.ratio;
         this.progress.next(Math.round(prgrs * 10000) / 100);
-        console.log(p)
-        console.log(prgrs)
+        // console.log(p)
+        // console.log(prgrs)
       },
     });
     this.isInited = true;
     await this.worker.load();
+    const end = (new Date()).getTime();
+    console.log('Duration init() = ' + this.helpersService.ms2TimeString(end - start));
+  }
+
+
+  async getKeyFrames2(n: string[], f: VideoObj) {
+    const start = (new Date()).getTime();
+    if (!this.isInited) {
+      await this.init();
+      await this.worker.write(f.file.name, f.file);
+    }
+    const keyFrames = [];
+    for (const ss of n) {
+      await this.worker.run(`
+        -ss ${ss} \
+        -i ${f.file.name} \
+        -f image2 \
+        -frames 1 \
+        frame.bmp \
+      `);
+      const imageFile = await this.worker.read('frame.bmp');
+      const type = 'image/bmp';
+      const src = this.sanitizer.bypassSecurityTrustUrl(
+        URL.createObjectURL(
+          new Blob([imageFile.data], { type })
+        )
+      );
+      if (src) {
+        this.keyFrameSubj.next(src);
+        keyFrames.push(src);
+      }
+    }
+    const end = (new Date()).getTime();
+    console.log('Duration getKeyFrames() = ' + this.helpersService.ms2TimeString(end - start));
+    return keyFrames;
   }
 
   async getKeyFrames(f: VideoObj) {
+    const start = (new Date()).getTime();
     if (!this.isInited) {
       await this.init();
+      await this.worker.write(f.file.name, f.file);
     }
-    await this.worker.write(f.file.name, f.file);
-    const fps = this.helpersService.getFps(this.videoFileService.getFileInfo()) || 1;
+    const fps = this.helpersService.getFps(this.videoFileService.getFileInfo(), 10) || 1;
     // console.log('fps = ' + fps)
     // await this.worker.run('-i ' + f.file.name + ' -loglevel info -stats -f image2 -vf fps=' + fps + ',showinfo -an out_%d.jpeg');
-    await this.worker.run('-i ' + f.file.name + ' -loglevel info -stats -f image2 -vf fps=fps=' + fps + ':round=near,showinfo -an out_%d.jpeg');
-    const filemask = /out_\d*\.jpeg/;
+    // await this.worker.run(`
+    //   -i ${f.file.name} \
+    //   -loglevel info -stats \
+    //   -f image2 \
+    //   -vf fps=fps=${fps}:round=near,showinfo \
+    //   -an out_%d.jpeg
+    //   `);
+    await this.worker.run(`
+      -i ${f.file.name} \
+      -loglevel info \
+      -f image2 \
+      -vf fps=fps=${fps} \
+      out_%d.bmp
+      `);
+    const filemask = /out_\d*\.bmp/;
     const lsData = await this.worker.ls('.');
     const keyFrames = [];
     // console.log(lsData)
@@ -64,7 +116,7 @@ export class VideoWorkService {
     for (const path of lsData.data) {
       if (filemask.test(path)) {
         const imageFile = await this.worker.read(path);
-        const type = 'image/jpeg';
+        const type = 'image/bmp';
         keyFrames.push(
           this.sanitizer.bypassSecurityTrustUrl(
             URL.createObjectURL(
@@ -74,15 +126,18 @@ export class VideoWorkService {
         );
       }
     }
+    const end = (new Date()).getTime();
+    console.log('Duration getKeyFrames() = ' + this.helpersService.ms2TimeString(end - start));
     return keyFrames;
   }
 
   async getFileInfo(f) {
+    const start = (new Date()).getTime();
     const outputFileName = this.helpersService.getTargetFileName(f.file.name, this.id);
     if (!this.isInited) {
       await this.init();
+      await this.worker.write(f.file.name, f.file);
     }
-    await this.worker.write(f.file.name, f.file);
     let result: any = {};
     const messSubscriber = this.message.subscribe(res => {
       if (res) {
@@ -97,7 +152,11 @@ export class VideoWorkService {
     // await this.worker.run('--help');
     // await this.worker.run('-i ' + f.file.name + ' -hide_banner -c copy -f null -');
     // await this.worker.run('-i ' + f.file.name + ' -hide_banner -loglevel quiet -stats -c copy ' + outputFileName);
-    await this.worker.run('-i ' + f.file.name + ' -loglevel quiet -stats -c copy -y ' + outputFileName);
+    await this.worker.run(`
+      -i ${f.file.name} \
+      -loglevel info \
+      -c copy -y ${outputFileName}
+      `);
     const {data} = await this.worker.read(outputFileName);
     const targetFile = {
       data,
@@ -106,11 +165,13 @@ export class VideoWorkService {
     };
     this.videoFileService.setTarget(targetFile);
     messSubscriber.unsubscribe();
+    const end = (new Date()).getTime();
+    console.log('Duration getFileInfo() = ' + this.helpersService.ms2TimeString(end - start));
     return result;
   }
 
 
-  async trim(params: {start: string, end: string}) {
+  async trim(params: {start: string|number, end?: string, duration?: number}) {
     const start = (new Date()).getTime();
     // console.log(params)
     if (!this.isInited) {
@@ -119,11 +180,22 @@ export class VideoWorkService {
     const inputFileName = this.videoFileService.sourceVideo.file.name;
     const outputFileName = this.videoFileService.targetVideo.file.name;
     const outputFileType = this.videoFileService.targetVideo.file.type;
-    await this.worker.trim(
-      inputFileName,
-      outputFileName,
-      params.start,
-      params.end);
+    if (params.duration) {
+      await this.worker.run(`
+        -i ${inputFileName} \
+        -ss ${params.start} \
+        -t ${params.duration} \
+        -loglevel info \
+        -c copy -y ${outputFileName}
+        `);
+    }
+    if (params.end) {
+      await this.worker.trim(
+        inputFileName,
+        outputFileName,
+        params.start,
+        params.end);
+    }
     const { data } = await this.worker.read(outputFileName);
     const targetFile = {
       data,
@@ -132,6 +204,7 @@ export class VideoWorkService {
     };
     this.videoFileService.setTarget(targetFile);
     const end = (new Date()).getTime();
-    console.log('Duration = ' + this.helpersService.ms2TimeString(start - end));
+    console.log('Duration trim() = ' + this.helpersService.ms2TimeString(end - start));
+    this.progress.next(100);
   }
 }

@@ -63,9 +63,11 @@ export class VideoTrimmerComponent implements OnInit {
 
   async actionTrim() {
     const params = {
-      start: this.helpersService.ms2TimeString(this.trim.min),
-      end: this.helpersService.ms2TimeString(this.trim.max)
-    }
+      // start: this.helpersService.ms2TimeString(this.trim.min),
+      // end: this.helpersService.ms2TimeString(this.trim.max),
+      start: this.trim.min / 1000,
+      duration: (this.trim.max - this.trim.min) / 1000
+    };
     await this.videoWorkService.trim(params);
   }
 }

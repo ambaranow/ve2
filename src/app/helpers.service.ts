@@ -63,11 +63,11 @@ export class HelpersService {
     return 'v_' + id + '.' + extension.toLowerCase();
   }
 
-  getFps(fileinfo) {
+  getFps(fileinfo: { time: any; }, frames: number) {
     let res = 1;
     const durSeconds = Math.floor(this.timeString2ms(fileinfo.time) / 1000);
     if (!isNaN(durSeconds)) {
-      res = 1 / (durSeconds / 20);
+      res = 1 / (durSeconds / frames);
       res = Math.floor(res * 100000) / 100000;
     }
     return res;

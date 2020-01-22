@@ -57,11 +57,29 @@ export class EditorAreaComponent implements OnInit {
         this.targetVideo = f;
       });
     });
-    this.videoWorkService.fileInfoSubj.subscribe(info => {
+    this.videoWorkService.fileInfoSubj.subscribe(async info => {
       this.videoFileService.setFileInfo(info);
+      // if (info && info.durationMs) {
+      //   this.videoWorkService.getKeyFrames(this.sourceVideo).then(res => {
+      //     this.keyFrames = res;
+      //   });
+      // }
       if (info && info.durationMs) {
-        this.videoWorkService.getKeyFrames(this.sourceVideo).then(res => {
+        const kfSubs = this.videoWorkService.keyFrameSubj.subscribe(src => {
+          if (src) {
+            this.keyFrames.push(src);
+          }
+        });
+        const n = [];
+        const ind = Math.round(info.durationMs / 20);
+        for (let i = 0; i < info.durationMs; i++) {
+          if (i % ind === 0) {
+            n.push(this.helpersService.ms2TimeString(i));
+          }
+        }
+        this.videoWorkService.getKeyFrames2(n, this.sourceVideo).then(res => {
           this.keyFrames = res;
+          kfSubs.unsubscribe();
         });
       }
     });

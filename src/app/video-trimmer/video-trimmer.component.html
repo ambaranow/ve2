@@ -6,7 +6,6 @@
   <div class="trim-shadow trim-shadow__min" [ngStyle]="{width: shadowSize('min')}"></div>
   <div class="trim-shadow trim-shadow__max" [ngStyle]="{width: shadowSize('max')}"></div>
 
-
   <mat-slider class="trim-min" *ngIf="durationMs && keyFrames.length" thumbLabel="true" min="0" max="{{durationMs}}"
     step="1"
     [(ngModel)]="trim.min" (change)="setRange($event, 'min')" [displayWith]="helpersService.ms2TimeString"
